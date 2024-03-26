@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  nginx:
+    build:
+      context: .
+      target: final_nginx
+      args:
+        API_URL: /
+    networks:
+      - reverse-proxy
+      - back
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      target: final_build
+    networks:
+      - back
+    expose:
+      - 3001
+    restart: always
+    environment:
+      - APP_PORT=3001
+    healthcheck:
+      timeout: 3s
+      interval: 3s
+      retries: 10
+
+networks:
+  reverse-proxy:
+    driver: bridge
+  back:
+    driver: bridge
